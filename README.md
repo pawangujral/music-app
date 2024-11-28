@@ -35,12 +35,16 @@ Again, this is not required. We respect that everyone has different amounts of t
   - `5432` (postgres)
 
 ### Instructions
-1. Clone repository
-2. Setup a new private repository with the source code
-3. Run `docker-compose up`
-4. Code
-5. Push your solution to a new branch
-6. Create a Pull Request when your ready and reach out to us for setting up the interview
+1. Clone the repository (avoid forking – we prefer if you create a new private repository).
+2. Create a new private repository.
+3. Navigate to the folder containing the cloned repository. (`cd fullstack-assignment/`)
+4. Update the remote URL to point to your new private repository: `git remote set-url origin  git@github.com:my-user/my-new-repo.git`
+5. Run `docker-compose-up` to setup the environment. 
+6. Start coding your solution!
+7. Push your solution to a new branch. 
+8. Go to your private repository and create a Pull Request for the branch you just pushed.
+9. Invite the reviewers with @epidemicsound.com email addresses as collaborators to your private repository  (the list of reviewers was shared in the email with the link to this repository).
+10. Notify us once you have shared access and created the Pull Request so we can proceed with scheduling the interview.
 
 To cleanup the Docker containers run `docker-compose down -v --rmi all --remove-orphans`
 
@@ -58,7 +62,7 @@ Some of the things we will look at in the evaluation:
 In this we also try to understand how you solve problems generally and how you communicate your solutions. Problem solving and communication are both things we value highly.
 
 #### Why did you pick this stack?
-This is the stack that the majority of our platform is written in. We definitely don't require you to be an expert in this stack and we are more interested in your knowledge of building web applications in general.
+This is the stack that some of our platform is written in. We definitely don't require you to be an expert in this stack and we are more interested in your knowledge of building web applications in general.
 
 #### Can I change things in the existing code?
 Yes please! We would love to hear what you think are some of the things that we can do better.
