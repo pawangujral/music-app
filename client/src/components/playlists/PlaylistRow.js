@@ -9,21 +9,24 @@ import CardActionArea from "@mui/material/CardActionArea";
 import { useNavigate } from "react-router";
 import Grid from "@mui/material/Grid2";
 
+// Component to display a playlist row
 function PlaylistRow({ playlist, onTrackDelete }) {
-  let navigate = useNavigate();
+  let navigate = useNavigate(); // Hook to navigate programmatically
 
-  const [previewTrack, setPreviewTrack] = useState();
+  const [previewTrack, setPreviewTrack] = useState(); // State to store the preview track
 
+  // Function to fetch tracks by ID
   const getTracks = (id) => {
     fetch(`/api/v1/tracks/${id}`)
       .then((res) => {
         return res.json();
       })
       .then((data) => {
-        setPreviewTrack(data.track);
+        setPreviewTrack(data.track); // Set the preview track state
       });
   };
 
+  // Effect to fetch the first track of the playlist when the playlist changes
   useEffect(() => {
     if (playlist && playlist.tracks.length) {
       getTracks(playlist.tracks[0]);
@@ -36,7 +39,7 @@ function PlaylistRow({ playlist, onTrackDelete }) {
         <CardActionArea onClick={() => navigate(`/playlists/${playlist.id}`)}>
           <CardMedia
             sx={{ height: 140 }}
-            image={previewTrack?.cover_art}
+            image={previewTrack?.cover_art} // Display the cover art of the preview track
             title="green iguana"
           />
           <CardContent>
@@ -50,8 +53,8 @@ function PlaylistRow({ playlist, onTrackDelete }) {
           <CardActions>
             <Button
               onClick={(e) => {
-                e.stopPropagation();
-                onTrackDelete(playlist.id);
+                e.stopPropagation(); // Prevent the click event from propagating to the CardActionArea
+                onTrackDelete(playlist.id); // Call the onTrackDelete function with the playlist ID
               }}
             >
               Delete

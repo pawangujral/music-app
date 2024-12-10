@@ -44,8 +44,6 @@ export function makeServer({ environment = "test" } = {}) {
       this.patch("/playlists/:id", (schema, request) => {
         const id = request.params.id;
         const attrs = JSON.parse(request.requestBody);
-        console.log("hello");
-        console.log(id, attrs);
         return schema.playlists.find(id).update(attrs);
       });
     },

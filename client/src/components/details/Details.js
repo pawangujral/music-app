@@ -2,56 +2,63 @@ import React, { useState, useEffect } from "react";
 import TrackRow from "./../tracks/TrackRow";
 import AudioPlayer from "./../tracks/AudioPlayer";
 import { useParams } from "react-router";
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 
 function Details() {
-  let params = useParams();
+  let params = useParams(); // Get URL parameters
 
-  const [tracks, setTracks] = useState([]);
-  const [currentTrack, setCurrentTrack] = useState();
-  const [playlist, setPlaylist] = useState();
+  const [tracks, setTracks] = useState([]); // State to store tracks
+  const [currentTrack, setCurrentTrack] = useState(); // State to store the currently playing track
+  const [playlist, setPlaylist] = useState(); // State to store the playlist
+  const [loading, setLoading] = useState(true); // State to manage loading state
 
   const getTracks = (id) => {
     if (!id) {
       return;
     }
-    fetch(`/api/v1/tracks/${id}`)
+    fetch(`/api/v1/tracks/${id}`) // Fetch track details by ID
       .then((res) => {
         return res.json();
       })
       .then((data) => {
         const { track } = data;
-        setTracks((prev) => [...prev, track]);
+        setTracks((prev) => [...prev, track]); // Add track to the state
+      })
+      .finally(() => {
+        setLoading(false); // Set loading to false after fetching
       });
   };
 
   const getPlaylist = () => {
-    fetch(`/api/v1/playlists/${params.id}`, { method: "GET" })
+    setLoading(true); // Set loading to true before fetching
+    fetch(`/api/v1/playlists/${params.id}`, { method: "GET" }) // Fetch playlist details by ID
       .then((res) => {
         return res.json();
       })
       .then((data) => {
         const { playlist } = data;
-        setPlaylist(playlist);
+        setPlaylist(playlist); // Set playlist to the state
       });
   };
 
   useEffect(() => {
-    getPlaylist();
+    getPlaylist(); // Fetch playlist when component mounts
   }, []);
 
   useEffect(() => {
     if (playlist && playlist.tracks.length) {
-      setTracks([]);
-      playlist.tracks.forEach((trackId) => getTracks(trackId));
+      setTracks([]); // Clear tracks before fetching new ones
+      playlist.tracks.forEach((trackId) => getTracks(trackId)); // Fetch each track in the playlist
     }
   }, [playlist]);
 
   const handlePlay = (track) => {
-    setCurrentTrack(track);
+    setCurrentTrack(track); // Set the currently playing track
   };
 
   const handleTrackDelete = (trackId) => {
-    const filterTracks = playlist.tracks.filter((id) => id !== trackId);
+    const filterTracks = playlist.tracks.filter((id) => id !== trackId); // Filter out the deleted track
     const updatedPlaylist = { ...playlist, tracks: filterTracks };
 
     fetch(`/api/v1/playlists/${params.id}`, {
@@ -59,7 +66,7 @@ function Details() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(updatedPlaylist),
+      body: JSON.stringify(updatedPlaylist), // Update playlist on the server
     })
       .then((res) => {
         if (res.ok) {
@@ -67,9 +74,17 @@ function Details() {
         }
       })
       .then((data) => {
-        getPlaylist();
+        setTracks(tracks.filter((track) => track.id !== trackId)); // Update tracks state after deletion
       });
   };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex" }}>
+        <CircularProgress /> {/* Show loading spinner */}
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -85,7 +100,8 @@ function Details() {
           />
         ))}
       </div>
-      {currentTrack && <AudioPlayer track={currentTrack} />}
+      {currentTrack && <AudioPlayer track={currentTrack} />}{" "}
+      {/* Show audio player if a track is selected */}
     </>
   );
 }

@@ -6,10 +6,13 @@ import FormDialog from "./Add";
 import Grid from "@mui/material/Grid2";
 
 function Playlists() {
+  // State to manage the dialog open/close status
   const [open, setOpen] = React.useState(false);
 
+  // State to store the list of playlists
   const [playlists, setPlaylists] = useState([]);
 
+  // Function to fetch playlists from the server
   const getPlaylists = () => {
     fetch("/api/v1/playlists")
       .then((res) => {
@@ -21,10 +24,12 @@ function Playlists() {
       });
   };
 
+  // Fetch playlists when the component mounts
   useEffect(() => {
     getPlaylists();
   }, []);
 
+  // Function to handle adding a new playlist
   const handleAddPlaylist = (value) => {
     fetch("/api/v1/playlists", {
       method: "POST",
@@ -48,6 +53,7 @@ function Playlists() {
       });
   };
 
+  // Function to handle deleting a playlist
   const handlePlaylistDelete = (id) => {
     fetch(`/api/v1/playlists/${id}`, {
       method: "DELETE",
@@ -61,10 +67,12 @@ function Playlists() {
     });
   };
 
+  // Function to open the add playlist dialog
   const handleClickOpen = () => {
     setOpen(true);
   };
 
+  // Function to close the add playlist dialog and add the playlist
   const handleClose = (name) => {
     handleAddPlaylist(name);
     setOpen(false);

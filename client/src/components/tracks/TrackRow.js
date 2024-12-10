@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
@@ -9,6 +9,7 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 
 function TrackRow({ track, handlePlay, playlists, onDelete, onOpen }) {
+  const btnRef = useRef();
   // State to keep track of the selected playlist
   const [selectedValue, setSelectedValue] = useState();
 
@@ -23,6 +24,8 @@ function TrackRow({ track, handlePlay, playlists, onDelete, onOpen }) {
       // If found, set the selectedValue to the playlist id
       if (findTrackInPlaylist) {
         setSelectedValue(findTrackInPlaylist.id);
+      } else {
+        setSelectedValue(null);
       }
     }
   }, [playlists]);
@@ -34,9 +37,16 @@ function TrackRow({ track, handlePlay, playlists, onDelete, onOpen }) {
         selectedValue ? (
           // If track is in a playlist, show filled favorite icon
           <IconButton
+            ref={btnRef}
             edge="end"
             aria-label="like"
-            onClick={() => onDelete(track.id)}
+            data-playlistid={selectedValue}
+            onClick={(e) => {
+              e.stopPropagation();
+              const playlistId = btnRef.current.dataset.playlistid;
+              console.log(track.id, playlistId);
+              onDelete(track.id, playlistId);
+            }}
           >
             <FavoriteIcon />
           </IconButton>

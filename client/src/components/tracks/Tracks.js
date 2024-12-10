@@ -51,24 +51,47 @@ function Tracks() {
     setCurrentTrack(track);
   };
 
+  const updateList = (id, payload) => {
+    fetch(`/api/v1/playlists/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        }
+      })
+      .then(() => {
+        fetchPlaylists();
+        setShowNotify(true);
+        setOpen(false);
+      });
+  };
+
   // Handle adding track to playlist
-  const handleAddToPlaylist = async (playlistData) => {
+  const handleAddToPlaylist = (playlistData) => {
     const updatedPlaylist = {
       ...playlistData,
       tracks: [...playlistData.tracks, selectedTrack],
     };
 
-    const response = await fetch(`/api/v1/playlists/${playlistData.id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedPlaylist),
-    });
-    await response.json();
-    fetchPlaylists();
-    setShowNotify(true);
-    setOpen(false);
+    updateList(playlistData.id, updatedPlaylist);
+  };
+
+  // Handle delete track to playlist
+  const handleDeleteToPlaylist = (trackId, playlistId) => {
+    const findPlaylist = playlists.find(
+      (playlist) => playlist.id === playlistId
+    );
+
+    const filterTracks = findPlaylist.tracks.filter((id) => id !== trackId);
+
+    const updatedPlaylist = { ...findPlaylist, tracks: filterTracks };
+
+    updateList(playlistId, updatedPlaylist);
   };
 
   // Handle dialog close
@@ -81,11 +104,6 @@ function Tracks() {
   const handleDialogOpen = (id) => {
     setSelectedTrack(id);
     setOpen(true);
-  };
-
-  const handleTrackDeleteFromPlaylist = async (id) => {
-    console.log(id);
-    console.log("Delete track");
   };
 
   const handleClose = (event, reason) => {
@@ -107,7 +125,7 @@ function Tracks() {
             handlePlay={handlePlay}
             playlists={playlists}
             onOpen={handleDialogOpen}
-            onDelete={handleTrackDeleteFromPlaylist}
+            onDelete={handleDeleteToPlaylist}
           />
         ))}
       </List>
