@@ -1,22 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import styles from "./App.module.css";
 import logo from "./assets/logo.svg";
+import { Routes, Route } from "react-router";
+import Tracks from "./../src/components/tracks/Tracks";
+import Playlists from "./../src/components/playlists/Playlists";
+import Details from "./../src/components/details/Details";
 
-import TrackRow from "./components/TrackRow";
-import AudioPlayer from "./components/AudioPlayer";
+import { NavLink } from "react-router";
 
 function App() {
-  const [tracks, setTracks] = useState([]);
-  const [currentTrack, setCurrentTrack] = useState();
-
-  useEffect(() => {
-    fetch("http://0.0.0.0:8000/tracks/", { mode: "cors" })
-      .then((res) => res.json())
-      .then((data) => setTracks(data));
-  }, []);
-
-  const handlePlay = (track) => setCurrentTrack(track);
-
   return (
     <>
       <main className={styles.app}>
@@ -24,20 +16,29 @@ function App() {
           <img src={logo} className={styles.logo} alt="Logo" />
           <ul className={styles.menu}>
             <li>
-              <a href="#" className={styles.active}>
+              <NavLink
+                to="/tracks"
+                className={({ isActive }) => (isActive ? styles.active : null)}
+              >
                 Tracks
-              </a>
+              </NavLink>
             </li>
             <li>
-              <a href="#">Playlists</a>
+              <NavLink
+                to="/playlists"
+                className={({ isActive }) => (isActive ? styles.active : null)}
+              >
+                Playlists
+              </NavLink>
             </li>
           </ul>
         </nav>
-        {tracks.map((track, ix) => (
-          <TrackRow key={ix} track={track} handlePlay={handlePlay} />
-        ))}
+        <Routes>
+          <Route path="/tracks" element={<Tracks />} />
+          <Route path="/playlists" element={<Playlists />} />
+          <Route path="/playlists/:id" element={<Details />} />
+        </Routes>
       </main>
-      {currentTrack && <AudioPlayer track={currentTrack} />}
     </>
   );
 }

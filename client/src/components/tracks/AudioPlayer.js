@@ -19,15 +19,19 @@ function AudioPlayer({ track }) {
   };
 
   const handleSliderChange = (e) => {
-    audioRef.current.currentTime =
-      (e.target.value / 1000) * audioRef.current.duration;
+    if (audioRef && audioRef.current) {
+      audioRef.current.currentTime =
+        (e.target.value / 1000) * audioRef.current.duration;
+    }
   };
 
   const handleTogglePlaybackClick = () => {
-    if (audioRef.current.paused) {
-      audioRef.current.play();
-    } else {
-      audioRef.current.pause();
+    if (audioRef && audioRef.current) {
+      if (audioRef.current.paused) {
+        audioRef.current.play();
+      } else {
+        audioRef.current.pause();
+      }
     }
   };
 
