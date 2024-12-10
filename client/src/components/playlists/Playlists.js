@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
 import PlaylistRow from "./PlaylistRow";
-import styles from "./Playlists.module.css";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import FormDialog from "./Add";
+import Grid from "@mui/material/Grid2";
 
 function Playlists() {
+  const [open, setOpen] = React.useState(false);
+
   const [playlists, setPlaylists] = useState([]);
-  const [inputValue, setInputValue] = useState("");
 
   const getPlaylists = () => {
     fetch("/api/v1/playlists")
@@ -21,7 +25,7 @@ function Playlists() {
     getPlaylists();
   }, []);
 
-  const handleAddPlaylist = () => {
+  const handleAddPlaylist = (value) => {
     fetch("/api/v1/playlists", {
       method: "POST",
       headers: {
@@ -29,7 +33,7 @@ function Playlists() {
       },
       body: JSON.stringify({
         id: Date.now(),
-        title: inputValue,
+        title: value,
         tracks: [],
         dateCreated: new Date().toISOString(),
       }),
@@ -41,7 +45,6 @@ function Playlists() {
       })
       .then((data) => {
         setPlaylists([...playlists, data.playlist]);
-        setInputValue("");
       });
   };
 
@@ -58,29 +61,19 @@ function Playlists() {
     });
   };
 
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (name) => {
+    handleAddPlaylist(name);
+    setOpen(false);
+  };
+
   return (
     <>
-      <div>
-        <div className={styles.header}>
-          <input
-            className={styles.input}
-            type="text"
-            placeholder="Enter new playlist name"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-          />
-          <button
-            className={styles.addPlaylist}
-            onClick={handleAddPlaylist}
-            disabled={!inputValue.length}
-          >
-            Add New Playlist
-          </button>
-        </div>
-
-        <hr className={styles.divider} />
-
-        <div className={styles.container}>
+      <Box sx={{ flexGrow: 1, mt: 2, mb: 2 }}>
+        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
           {playlists.map((playlist, ix) => (
             <PlaylistRow
               key={playlist.id}
@@ -88,8 +81,13 @@ function Playlists() {
               onTrackDelete={handlePlaylistDelete}
             />
           ))}
-        </div>
-      </div>
+        </Grid>
+      </Box>
+
+      <Button variant="outlined" onClick={handleClickOpen} sx={{ mt: 2 }}>
+        Add New Playlist
+      </Button>
+      <FormDialog open={open} onClose={handleClose} />
     </>
   );
 }

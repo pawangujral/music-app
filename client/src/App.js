@@ -7,10 +7,18 @@ import Playlists from "./../src/components/playlists/Playlists";
 import Details from "./../src/components/details/Details";
 
 import { NavLink } from "react-router";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
 
+const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+});
 function App() {
   return (
-    <>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
       <main className={styles.app}>
         <nav>
           <img src={logo} className={styles.logo} alt="Logo" />
@@ -33,13 +41,14 @@ function App() {
             </li>
           </ul>
         </nav>
+
         <Routes>
           <Route path="/tracks" element={<Tracks />} />
           <Route path="/playlists" element={<Playlists />} />
           <Route path="/playlists/:id" element={<Details />} />
         </Routes>
       </main>
-    </>
+    </ThemeProvider>
   );
 }
 
