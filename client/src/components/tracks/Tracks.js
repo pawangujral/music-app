@@ -3,8 +3,9 @@ import TrackRow from "./TrackRow";
 import AudioPlayer from "./AudioPlayer";
 import List from "@mui/material/List";
 import SimpleDialog from "./SimpleDialog";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
+import { enqueueSnackbar } from "notistack";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function Tracks() {
   // State variables
@@ -14,10 +15,12 @@ function Tracks() {
   const [playlists, setPlaylists] = useState([]); // List of playlists
   const [selectedValue, setSelectedValue] = useState(); // Selected playlist value
   const [selectedTrack, setSelectedTrack] = useState(); // Track selected to add to playlist
-  const [showNotify, setShowNotify] = useState(false); // Snackbar open state
+  // State to manage loading state
+  const [loading, setLoading] = useState(true);
 
   // Fetch tracks from API
   const getTracks = () => {
+    setLoading(true);
     fetch("/api/v1/tracks")
       .then((res) => {
         return res.json();
@@ -25,6 +28,14 @@ function Tracks() {
       .then((data) => {
         const { tracks } = data;
         setTracks(tracks);
+      })
+      .catch(() => {
+        enqueueSnackbar("Something went wrong, try again!", {
+          variant: "error",
+        });
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -37,6 +48,11 @@ function Tracks() {
       .then((data) => {
         const { playlists } = data;
         setPlaylists(playlists);
+      })
+      .catch(() => {
+        enqueueSnackbar("Something went wrong, try again!", {
+          variant: "error",
+        });
       });
   };
 
@@ -51,7 +67,7 @@ function Tracks() {
     setCurrentTrack(track);
   };
 
-  const updateList = (id, payload) => {
+  const updateList = (id, payload, type) => {
     fetch(`/api/v1/playlists/${id}`, {
       method: "PATCH",
       headers: {
@@ -66,8 +82,19 @@ function Tracks() {
       })
       .then(() => {
         fetchPlaylists();
-        setShowNotify(true);
         setOpen(false);
+        if (type === "delete") {
+          enqueueSnackbar("Track removed from playlist", {
+            variant: "warning",
+          });
+        } else {
+          enqueueSnackbar("Added to playlist", { variant: "success" });
+        }
+      })
+      .catch(() => {
+        enqueueSnackbar("Something went wrong, try again!", {
+          variant: "error",
+        });
       });
   };
 
@@ -78,7 +105,7 @@ function Tracks() {
       tracks: [...playlistData.tracks, selectedTrack],
     };
 
-    updateList(playlistData.id, updatedPlaylist);
+    updateList(playlistData.id, updatedPlaylist, "add");
   };
 
   // Handle delete track to playlist
@@ -91,7 +118,7 @@ function Tracks() {
 
     const updatedPlaylist = { ...findPlaylist, tracks: filterTracks };
 
-    updateList(playlistId, updatedPlaylist);
+    updateList(playlistId, updatedPlaylist, "delete");
   };
 
   // Handle dialog close
@@ -106,13 +133,13 @@ function Tracks() {
     setOpen(true);
   };
 
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setOpen(false);
-  };
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex" }}>
+        <CircularProgress /> {/* Show loading spinner */}
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -136,16 +163,6 @@ function Tracks() {
         onClose={handleDialogClose}
         data={playlists}
       />
-      <Snackbar open={showNotify} autoHideDuration={1200} onClose={handleClose}>
-        <Alert
-          onClose={handleClose}
-          severity="success"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          Successfully added to playlist!
-        </Alert>
-      </Snackbar>
       {/* Audio player for current track */}
       {currentTrack && <AudioPlayer track={currentTrack} />}
     </>

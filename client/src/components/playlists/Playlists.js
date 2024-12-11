@@ -4,16 +4,22 @@ import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import FormDialog from "./Add";
 import Grid from "@mui/material/Grid2";
+import { enqueueSnackbar } from "notistack";
+import MusicNoteIcon from "@mui/icons-material/MusicNote";
+import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function Playlists() {
   // State to manage the dialog open/close status
   const [open, setOpen] = React.useState(false);
-
   // State to store the list of playlists
   const [playlists, setPlaylists] = useState([]);
+  // State to manage loading state
+  const [loading, setLoading] = useState(true);
 
   // Function to fetch playlists from the server
   const getPlaylists = () => {
+    setLoading(true);
     fetch("/api/v1/playlists")
       .then((res) => {
         return res.json();
@@ -21,6 +27,14 @@ function Playlists() {
       .then((data) => {
         const { playlists } = data;
         setPlaylists(playlists);
+      })
+      .catch(() => {
+        enqueueSnackbar("Something went wrong, try again!", {
+          variant: "error",
+        });
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -50,6 +64,12 @@ function Playlists() {
       })
       .then((data) => {
         setPlaylists([...playlists, data.playlist]);
+        enqueueSnackbar("Playlist added successfully", { variant: "success" });
+      })
+      .catch(() => {
+        enqueueSnackbar("Something went wrong, try again!", {
+          variant: "error",
+        });
       });
   };
 
@@ -60,11 +80,20 @@ function Playlists() {
       headers: {
         "Content-Type": "application/json",
       },
-    }).then((res) => {
-      if (res.ok) {
-        setPlaylists(playlists.filter((playlist) => playlist.id !== id));
-      }
-    });
+    })
+      .then((res) => {
+        if (res.ok) {
+          setPlaylists(playlists.filter((playlist) => playlist.id !== id));
+          enqueueSnackbar("Playlist deleted successfully", {
+            variant: "warning",
+          });
+        }
+      })
+      .catch(() => {
+        enqueueSnackbar("Something went wrong, try again!", {
+          variant: "error",
+        });
+      });
   };
 
   // Function to open the add playlist dialog
@@ -77,6 +106,31 @@ function Playlists() {
     handleAddPlaylist(name);
     setOpen(false);
   };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex" }}>
+        <CircularProgress /> {/* Show loading spinner */}
+      </Box>
+    );
+  }
+
+  if (!playlists.length) {
+    return (
+      <>
+        <Alert
+          icon={<MusicNoteIcon fontSize="inherit" />}
+          severity="warning"
+          variant="outlined"
+        >
+          Let's add your first playlist!
+        </Alert>
+        <Button variant="outlined" onClick={handleClickOpen} sx={{ mt: 2 }}>
+          Add New Playlist
+        </Button>
+      </>
+    );
+  }
 
   return (
     <>

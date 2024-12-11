@@ -4,9 +4,15 @@ import AudioPlayer from "./../tracks/AudioPlayer";
 import { useParams } from "react-router";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
+import { enqueueSnackbar } from "notistack";
+import Alert from "@mui/material/Alert";
+import MusicNoteIcon from "@mui/icons-material/MusicNote";
+import Button from "@mui/material/Button";
+import { useNavigate } from "react-router";
 
 function Details() {
   let params = useParams(); // Get URL parameters
+  let navigate = useNavigate(); // Hook to navigate programmatically
 
   const [tracks, setTracks] = useState([]); // State to store tracks
   const [currentTrack, setCurrentTrack] = useState(); // State to store the currently playing track
@@ -25,6 +31,11 @@ function Details() {
         const { track } = data;
         setTracks((prev) => [...prev, track]); // Add track to the state
       })
+      .catch(() => {
+        enqueueSnackbar("Something went wrong, try again!", {
+          variant: "error",
+        });
+      })
       .finally(() => {
         setLoading(false); // Set loading to false after fetching
       });
@@ -39,6 +50,11 @@ function Details() {
       .then((data) => {
         const { playlist } = data;
         setPlaylist(playlist); // Set playlist to the state
+      })
+      .catch(() => {
+        enqueueSnackbar("Something went wrong, try again!", {
+          variant: "error",
+        });
       });
   };
 
@@ -75,6 +91,14 @@ function Details() {
       })
       .then((data) => {
         setTracks(tracks.filter((track) => track.id !== trackId)); // Update tracks state after deletion
+        enqueueSnackbar("Track removed from playlist", {
+          variant: "warning",
+        });
+      })
+      .catch(() => {
+        enqueueSnackbar("Something went wrong, try again!", {
+          variant: "error",
+        });
       });
   };
 
@@ -83,6 +107,27 @@ function Details() {
       <Box sx={{ display: "flex" }}>
         <CircularProgress /> {/* Show loading spinner */}
       </Box>
+    );
+  }
+
+  if (!tracks.length) {
+    return (
+      <Alert
+        icon={<MusicNoteIcon fontSize="inherit" />}
+        severity="warning"
+        variant="outlined"
+        action={
+          <Button
+            color="inherit"
+            size="small"
+            onClick={() => navigate("/tracks")}
+          >
+            Go to tracks!
+          </Button>
+        }
+      >
+        Your playlist is empty. Add some tracks to get started!
+      </Alert>
     );
   }
 

@@ -8,6 +8,7 @@ import Typography from "@mui/material/Typography";
 import CardActionArea from "@mui/material/CardActionArea";
 import { useNavigate } from "react-router";
 import Grid from "@mui/material/Grid2";
+import { enqueueSnackbar } from "notistack";
 
 // Component to display a playlist row
 function PlaylistRow({ playlist, onTrackDelete }) {
@@ -23,6 +24,11 @@ function PlaylistRow({ playlist, onTrackDelete }) {
       })
       .then((data) => {
         setPreviewTrack(data.track); // Set the preview track state
+      })
+      .catch(() => {
+        enqueueSnackbar("Something went wrong, try again!", {
+          variant: "error",
+        });
       });
   };
 
