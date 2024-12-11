@@ -4,8 +4,18 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router";
+import { SnackbarProvider } from "notistack";
 
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { makeServer } from "./server/server";
+
+import CssBaseline from "@mui/material/CssBaseline";
+
+const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+});
 
 if (process.env.NODE_ENV === "development") {
   makeServer({ environment: "development" });
@@ -14,7 +24,13 @@ if (process.env.NODE_ENV === "development") {
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <ThemeProvider theme={darkTheme}>
+        <SnackbarProvider>
+          <CssBaseline />
+
+          <App />
+        </SnackbarProvider>
+      </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById("root")

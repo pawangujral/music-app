@@ -7,7 +7,7 @@ import Grid from "@mui/material/Grid2";
 import { enqueueSnackbar } from "notistack";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
 import Alert from "@mui/material/Alert";
-import CircularProgress from "@mui/material/CircularProgress";
+import Loader from "./../../design/Loader";
 
 function Playlists() {
   // State to manage the dialog open/close status
@@ -98,6 +98,7 @@ function Playlists() {
 
   // Function to open the add playlist dialog
   const handleClickOpen = () => {
+    console.log("hello");
     setOpen(true);
   };
 
@@ -108,16 +109,12 @@ function Playlists() {
   };
 
   if (loading) {
-    return (
-      <Box sx={{ display: "flex" }}>
-        <CircularProgress /> {/* Show loading spinner */}
-      </Box>
-    );
+    return <Loader />;
   }
 
-  if (!playlists.length) {
-    return (
-      <>
+  return (
+    <>
+      {playlists.length === 0 ? (
         <Alert
           icon={<MusicNoteIcon fontSize="inherit" />}
           severity="warning"
@@ -125,26 +122,23 @@ function Playlists() {
         >
           Let's add your first playlist!
         </Alert>
-        <Button variant="outlined" onClick={handleClickOpen} sx={{ mt: 2 }}>
-          Add New Playlist
-        </Button>
-      </>
-    );
-  }
-
-  return (
-    <>
-      <Box sx={{ flexGrow: 1, mt: 2, mb: 2 }}>
-        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-          {playlists.map((playlist, ix) => (
-            <PlaylistRow
-              key={playlist.id}
-              playlist={playlist}
-              onTrackDelete={handlePlaylistDelete}
-            />
-          ))}
-        </Grid>
-      </Box>
+      ) : (
+        <Box sx={{ flexGrow: 1, mt: 2, mb: 2 }}>
+          <Grid
+            container
+            rowSpacing={1}
+            columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+          >
+            {playlists.map((playlist, ix) => (
+              <PlaylistRow
+                key={playlist.id}
+                playlist={playlist}
+                onTrackDelete={handlePlaylistDelete}
+              />
+            ))}
+          </Grid>
+        </Box>
+      )}
 
       <Button variant="outlined" onClick={handleClickOpen} sx={{ mt: 2 }}>
         Add New Playlist

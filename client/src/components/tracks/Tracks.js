@@ -4,8 +4,7 @@ import AudioPlayer from "./AudioPlayer";
 import List from "@mui/material/List";
 import SimpleDialog from "./SimpleDialog";
 import { enqueueSnackbar } from "notistack";
-import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress";
+import Loader from "./../../design/Loader";
 
 function Tracks() {
   // State variables
@@ -82,7 +81,6 @@ function Tracks() {
       })
       .then(() => {
         fetchPlaylists();
-        setOpen(false);
         if (type === "delete") {
           enqueueSnackbar("Track removed from playlist", {
             variant: "warning",
@@ -123,6 +121,7 @@ function Tracks() {
 
   // Handle dialog close
   const handleDialogClose = (value) => {
+    setOpen(false);
     setSelectedValue(value);
     handleAddToPlaylist(value);
   };
@@ -134,11 +133,7 @@ function Tracks() {
   };
 
   if (loading) {
-    return (
-      <Box sx={{ display: "flex" }}>
-        <CircularProgress /> {/* Show loading spinner */}
-      </Box>
-    );
+    return <Loader />;
   }
 
   return (

@@ -10,11 +10,6 @@ export function makeServer({ environment = "test" } = {}) {
     },
     seeds(server) {
       dummyData.map((track) => server.create("track", track));
-      server.create("playlist", {
-        id: 1,
-        title: "Saved Tracks",
-        tracks: [dummyData[0].id],
-      });
     },
     routes() {
       this.urlPrefix = "http://localhost:3000";

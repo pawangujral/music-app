@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import TrackRow from "./../tracks/TrackRow";
 import AudioPlayer from "./../tracks/AudioPlayer";
 import { useParams } from "react-router";
-import CircularProgress from "@mui/material/CircularProgress";
-import Box from "@mui/material/Box";
+import Loader from "./../../design/Loader";
 import { enqueueSnackbar } from "notistack";
 import Alert from "@mui/material/Alert";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
@@ -55,6 +54,9 @@ function Details() {
         enqueueSnackbar("Something went wrong, try again!", {
           variant: "error",
         });
+      })
+      .finally(() => {
+        setLoading(false); // Set loading to false after fetching
       });
   };
 
@@ -104,13 +106,11 @@ function Details() {
 
   if (loading) {
     return (
-      <Box sx={{ display: "flex" }}>
-        <CircularProgress /> {/* Show loading spinner */}
-      </Box>
+      <Loader /> // Show loader while fetching data
     );
   }
 
-  if (!tracks.length) {
+  if (!loading && !tracks.length) {
     return (
       <Alert
         icon={<MusicNoteIcon fontSize="inherit" />}

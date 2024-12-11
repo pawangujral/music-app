@@ -8,6 +8,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 
 // Define the FormDialog component, which takes 'open' and 'onClose' as props
 function FormDialog({ open, onClose }) {
+  console.log("open", open);
   return (
     <React.Fragment>
       <Dialog
